@@ -34,6 +34,15 @@ public class BookManager {
 		return null;
 	}
 
+	public Book findBook(UUID id) {
+		for (Book book : bookList) {
+			if (book.getId().equals(id)) {
+				return book;
+			}
+		}
+		throw new IllegalArgumentException("No such book: " + id);
+	}
+	
 	public List<Book> showAllBooks() {
 		return bookList;
 	}

@@ -2,6 +2,8 @@ package com.booktrading;
 
 import java.io.IOException;
 
+import com.booktrading.ui.MainWindow;
+
 public class Bookstore {
 
 	public static void main(String[] args) throws Exception {
@@ -14,13 +16,15 @@ public class Bookstore {
 			manager.addBook(new Book("Joker Batman", "Adriana", 34.98, "Painer", false, 15));
 			manager.addBook(new Book("Joker Poker", "Adriana", 104.98, "Painer", true, 7));
 		}
-		Book searchExactMatch = manager.searchExactMatch("Joker Media");
-		System.out.println(searchExactMatch.getInStock());
-		manager.sellBook(searchExactMatch, 1);
-		for (Book b : manager.showAllBooks()) {
-			System.out.println(b.getTitle() + " , " + b.getInStock() + " in stock");
-		}
-		manager.saveToFile();
+		// Book searchExactMatch = manager.searchExactMatch("Joker Media");
+		// System.out.println(searchExactMatch.getInStock());
+		// manager.sellBook(searchExactMatch, 1);
+		// for (Book b : manager.showAllBooks()) {
+		// System.out.println(b.getTitle() + " , " + b.getInStock() + " in
+		// stock");
+		// }
+		// manager.saveToFile();
+		new MainWindow(manager).setVisible(true);
 	}
 
 }
