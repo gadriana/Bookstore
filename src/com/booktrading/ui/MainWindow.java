@@ -24,7 +24,7 @@ public class MainWindow extends JFrame {
 	public MainWindow(BookManager manager) {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("Bookstore Marusia");
-		setBounds(800, 500, 500, 500);
+		setBounds(800, 500, 500, 300);
 		setLayout(new BorderLayout());
 		DefaultTableModel model = new DefaultTableModel();
 		model.setColumnIdentifiers(new String[]{"ID","Title","Author","Publisher","Price","Foreign?","Stock"});
