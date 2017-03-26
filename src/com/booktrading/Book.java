@@ -21,6 +21,9 @@ public class Book implements Serializable{
 		this.isForeignBook = isForeignBook;
 		this.inStock = inStock;
 	}
+	public Book() {
+	}
+	
 
 	public String getTitle() {
 		return title;

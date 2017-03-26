@@ -3,6 +3,10 @@ package com.booktrading;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+
 public class BookManager {
 
 	private List<Book> bookList = new ArrayList<>();
@@ -42,7 +46,7 @@ public class BookManager {
 		}
 		throw new IllegalArgumentException("No such book: " + id);
 	}
-	
+
 	public List<Book> showAllBooks() {
 		return bookList;
 	}
@@ -63,22 +67,40 @@ public class BookManager {
 	}
 
 	public boolean loadFromFile() throws IOException {
-		File source = new File("booklist");
+		File source = new File("booklist.csv");
 		if (!source.exists()) {
 			return false;
 		}
-		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(source))) {
-			bookList = (List<Book>) in.readObject();
-		} catch (ClassNotFoundException | ClassCastException e) {
+		try (Reader in = new FileReader(source)) {
+			Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+			for (CSVRecord record : records) {
+				Book b = new Book();
+				b.setTitle(record.get("Title"));
+				b.setAuthor(record.get("Author"));
+				b.setPrice(Double.parseDouble(record.get("Price")));
+				b.setPublisher(record.get("Publisher"));
+				b.setForeignBook(Boolean.parseBoolean(record.get("FL")));
+				b.setInStock(Integer.parseInt(record.get("Stock")));
+				b.setId(UUID.fromString(record.get("ID")));
+				bookList.add(b);
+
+			}
+
+		} catch (RuntimeException e) {
 			throw new IOException(e);
 		}
 		return true;
 	}
 
 	public void saveToFile() throws IOException {
-		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("booklist"))) {
+		try (Writer out = new FileWriter("booklist.csv")) {
 
-			out.writeObject(bookList);
+			final CSVPrinter printer = CSVFormat.DEFAULT
+					.withHeader("Title", "Author", "Price", "Publisher", "FL", "Stock", "ID").print(out);
+			for (Book book : bookList) {
+				printer.printRecord(book.getTitle(), book.getAuthor(), book.getPrice(), book.getPublisher(), book.isForeignBook(),book.getInStock(), book.getId());
+
+			}
 		}
 
 	}
