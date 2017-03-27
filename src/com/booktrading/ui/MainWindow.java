@@ -1,6 +1,7 @@
 package com.booktrading.ui;
 
 import java.awt.BorderLayout;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -97,7 +98,21 @@ public class MainWindow extends JFrame {
 				}
 			}
 		}));
-		menu.add(new JMenuItem("ADD"));
+		menu.add(new JMenuItem(new AbstractAction("ADD") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JScrollPane addScreen=new JScrollPane();
+				//TODO fill addScreen with TextBoxes
+				addScreen.add(new TextField());
+				
+				int result = JOptionPane.showConfirmDialog(MainWindow.this, addScreen, "Add book ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				if (result == JOptionPane.OK_OPTION) {
+					Book b = new Book();
+					//model.addRow(rowData);
+				}
+				
+			}}));
+
 		menu.add(new JMenuItem(new AbstractAction("DELETE") {
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -9,7 +9,7 @@ public class Bookstore {
 	public static void main(String[] args) throws Exception {
 		BookManager manager = new BookManager();
 		if (manager.loadFromFile()) {
-			System.out.println("I have loaded the Books from the file,madam!");
+			//System.out.println("I have loaded the Books from the file,madam!");
 		} else {
 			manager.addBook(new Book("Joker for dummies", "Adriana", 24.98, "Painer", false, 23));
 			manager.addBook(new Book("Joker Media", "Adriana", 4.98, "Painer", false, 3));
