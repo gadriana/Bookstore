@@ -3,6 +3,8 @@ package com.booktrading.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.AbstractAction;
@@ -15,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import com.booktrading.Book;
 import com.booktrading.BookManager;
@@ -27,17 +30,48 @@ public class MainWindow extends JFrame {
 		setBounds(800, 500, 500, 300);
 		setLayout(new BorderLayout());
 		DefaultTableModel model = new DefaultTableModel();
-		model.setColumnIdentifiers(new String[]{"ID","Title","Author","Publisher","Price","Foreign?","Stock"});
+		model.setColumnIdentifiers(new String[] { "ID", "Title", "Author", "Publisher", "Price", "Foreign?", "Stock" });
 		for (Book b : manager.showAllBooks()) {
-			model.addRow(new Object[]{b.getId(),b.getTitle(),b.getAuthor(),b.getPublisher(),b.getPrice(),b.isForeignBook(),b.getInStock()});
+			model.addRow(new Object[] { b.getId(), b.getTitle(), b.getAuthor(), b.getPublisher(), b.getPrice(),
+					b.isForeignBook(), b.getInStock() });
 		}
 		JTable booklist = new JTable(model);
 		booklist.getColumnModel().removeColumn(booklist.getColumnModel().getColumn(0));
 		add(new JScrollPane(booklist));
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("MENU");
-		menu.add(new JMenuItem("SEARCH"));
+		menu.add(new JMenuItem(new AbstractAction("SEARCH") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				String searchedItem = JOptionPane.showInputDialog(MainWindow.this, "Enter the book you seek: ",
+						"Search book: ", JOptionPane.PLAIN_MESSAGE);
+
+				if (searchedItem == null) {
+					return;
+				}
+				List<Book> results = new ArrayList<>(manager.searchBook(searchedItem));
+				if (results.size() > 0) {
+
+					DefaultTableModel model2 = new DefaultTableModel();
+					model2.setColumnIdentifiers(
+							new String[] { "ID", "Title", "Author", "Publisher", "Price", "Foreign?", "Stock" });
+					for (Book b : results) {
+						model2.addRow(new Object[] { b.getId(), b.getTitle(), b.getAuthor(), b.getPublisher(),
+								b.getPrice(), b.isForeignBook(), b.getInStock() });
+					}
+					JTable booklist2 = new JTable(model2);
+					Object message = new JScrollPane(booklist2);
+					booklist2.getColumnModel().removeColumn(booklist2.getColumnModel().getColumn(0));
+					JOptionPane.showMessageDialog(MainWindow.this, new JScrollPane(booklist2), "Results",
+							JOptionPane.PLAIN_MESSAGE);
+				} else {
+
+					JOptionPane.showMessageDialog(MainWindow.this, "We do not have your book");
+				}
+			}
+		}));
 		menu.add(new JMenuItem(new AbstractAction("SELL") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -48,8 +82,8 @@ public class MainWindow extends JFrame {
 				}
 				Book book = manager.findBook((UUID) model.getValueAt(selectedRow, 0));
 
-				String quantity = JOptionPane.showInputDialog(MainWindow.this,
-						"Enter quantity", "Sell book: " + book.getTitle(), JOptionPane.PLAIN_MESSAGE);
+				String quantity = JOptionPane.showInputDialog(MainWindow.this, "Enter quantity",
+						"Sell book: " + book.getTitle(), JOptionPane.PLAIN_MESSAGE);
 				if (quantity == null) {
 					return;
 				}
@@ -58,12 +92,39 @@ public class MainWindow extends JFrame {
 				try {
 					manager.saveToFile();
 				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(MainWindow.this, e1.toString(), "Error saving", JOptionPane.ERROR_MESSAGE);					
+					JOptionPane.showMessageDialog(MainWindow.this, e1.toString(), "Error saving",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}));
 		menu.add(new JMenuItem("ADD"));
-		menu.add(new JMenuItem("DELETE"));
+		menu.add(new JMenuItem(new AbstractAction("DELETE") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int selectedRow = booklist.getSelectedRow();
+				if (selectedRow == -1) {
+					JOptionPane.showMessageDialog(MainWindow.this, "Please select a book");
+					return;
+				}
+				Book book = manager.findBook((UUID) model.getValueAt(selectedRow, 0));
+
+				// String quantity =
+				// JOptionPane.showInputDialog(MainWindow.this,
+				// "Enter quantity", "Delete book: " + book.getTitle(),
+				// JOptionPane.PLAIN_MESSAGE);
+				// if (quantity == null) {
+				// return;
+				// }
+				manager.deleteBook(book);
+				model.removeRow(selectedRow);
+				try {
+					manager.saveToFile();
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(MainWindow.this, e1.toString(), "Error saving",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}));
 		menu.addSeparator();
 		menu.add(new JMenuItem(new AbstractAction("EXIT") {
 			@Override
